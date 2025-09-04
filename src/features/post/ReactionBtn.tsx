@@ -1,6 +1,4 @@
-import React from "react";
-import { useDispatch } from "react-redux";
-import { addReaction } from "./PostSlice";
+import React, { useState } from "react";
 
 const reactionEmoji = {
   wow: "😮",
@@ -8,15 +6,29 @@ const reactionEmoji = {
   rocket: "🚀",
   coffee: "☕",
 };
+
 const ReactionBtn = ({post}: {post: any}) =>{
-  const dispatch = useDispatch();
+  const [reactions, setReactions] = useState(post.reactions || {
+    wow: 0,
+    heart: 0,
+    rocket: 0,
+    coffee: 0,
+  });
+
+  const handleReaction = (reactionName: string) => {
+    setReactions(prev => ({
+      ...prev,
+      [reactionName]: (prev[reactionName] || 0) + 1
+    }));
+  };
+
   const reactionsButtons = Object.entries(reactionEmoji).map(([name,emoji])=>{
     return (
         <button 
         key={name}
          type="button" className="" 
-         onClick={()=>dispatch(addReaction({postId:post.id,reaction:name}))}>
-            {emoji} {post.reactions[name]}
+         onClick={()=>handleReaction(name)}>
+            {emoji} {reactions[name]}
         </button>
     )
   });

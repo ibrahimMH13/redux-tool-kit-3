@@ -1,11 +1,8 @@
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { getCount, incerateCount } from "../../features/post/PostSlice";
+
 const Header = () => {
-  const dispatch = useDispatch();
-  
-  const count = useSelector(getCount);
+  const [count, setCount] = useState(0);
 
   return (
     <header
@@ -31,7 +28,7 @@ const Header = () => {
             </Link>
           </li>
         </ul>
-        <button onClick={()=>{dispatch(incerateCount())}}>
+        <button onClick={()=>{setCount(count + 1)}}>
           {count}
         </button>
       </nav>
