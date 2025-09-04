@@ -1,15 +1,19 @@
 import React from "react";
-import { useGetPostsQuery } from "./PostSlice";
+import { useLazyGetPostsQuery } from "./PostSlice";
 import PostsExcerpt from "./PostsExcerpt";
 
 const PostList = () => {
-  const {
+  const [getPosts, {
     data: posts,
     isLoading,
     isSuccess,
     isError,
     error
-  } = useGetPostsQuery(undefined);
+  }] = useLazyGetPostsQuery();
+
+  React.useEffect(() => {
+    getPosts(undefined);
+  }, [getPosts]);
 
   let render: any;
 

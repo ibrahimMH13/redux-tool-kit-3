@@ -1,25 +1,25 @@
 import { useState } from "react";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { addPost, addNewPost } from "./PostSlice";
+import { useSelector } from "react-redux";
 import { selectAllUsers } from "../user/UserSlice";
-import { AppDispatch } from "../../app/store";
-
+import {useAddNewPostMutation} from "./PostSlice"
+import { useNavigate } from "react-router-dom";
 
 const AddPostForm = () => {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [userId, setUserId] = useState("");
-  const [addRequest, setAddRequest] = useState("idle");
-  const dispatch = useDispatch<AppDispatch>();
+  const [addNewPost,{
+    isLoading,
+  }] = useAddNewPostMutation();
+  const nav = useNavigate();
   const userList = useSelector(selectAllUsers);
 
   const titleHandler = (e: React.ChangeEvent<HTMLInputElement>)=>{
         setTitle(e.target.value);
   }
-  
+  const [title,setTitle] = useState('');
+  const [content,setContent] = useState('');
+  const [userId,setUserId] = useState('');
   //const canSave = Boolean(title) && Boolean(content) && Boolean(userId);
-  const canSave = [title,content,userId].every(Boolean) && addRequest ==='idle';
+  const canSave = [title,content,userId].every(Boolean) && !isLoading;
 
   const contentHandler = (e: React.ChangeEvent<HTMLTextAreaElement>)=>{
     setContent(e.target.value);
@@ -27,23 +27,20 @@ const AddPostForm = () => {
   const selectHandler = (e: React.ChangeEvent<HTMLSelectElement>) => setUserId(e.target.value);
   
   const saveHandler = async ()=>{
-    // if(content && title){
-    //     dispatch(addPost(title,content,userId));
-    //     setTitle('');
-    //     setContent('');
-    //     setUserId('');
-    // }
     if(canSave){
       try{
-        setAddRequest('pending');
-       await dispatch(addNewPost({title,body:content,userId})).unwrap();
+        await addNewPost({
+          title,
+          body:content,
+          userId
+        }).unwrap();
         setTitle('');
         setContent('');
         setUserId('');
+        nav('/');
+
       }catch(e){
         console.log('server#',e);
-      }finally{
-        setAddRequest('idle');
       }
     }
   }

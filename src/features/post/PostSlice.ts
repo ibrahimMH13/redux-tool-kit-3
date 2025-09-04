@@ -74,14 +74,61 @@ export const extendedApiSlice = ApiSlice.injectEndpoints({
             ...(r?.ids?.map(id=>({type:'posts' as const,id})) || [])
           ]
         }
+      }),
+      addNewPost: builder.mutation({
+        query: initialPost =>({
+          url:'/posts',
+          method:'POST',
+          body:{
+            ...initialPost,
+            userId: Number(initialPost.userId),
+            date: new Date().toISOString(),
+            reactions:{
+              wow:0,
+              heart:0,
+              rocket:0,
+              coffee: 0
+            }
+          }
+        }),
+        invalidatesTags:[
+          {
+            type: 'posts',id:"LIST"
+          }
+        ]
+      }),
+      updatePost: builder.mutation({
+        query: initialPost =>({
+          url: `/posts/${initialPost.id}`,
+          method:'PUT',
+          body:{
+            ...initialPost,
+            date:new Date().toISOString()
+          }
+        }),
+        invalidatesTags:(r,e,a)=>[
+          {
+            type:'posts',id:a.id
+          }
+        ]
+      }),
+      deletePost:builder.mutation({
+        query: ({id})=>({
+          url:`/posts/${id}`,
+          method:'DELETE',
+          body:{id}
+        })
       })
   })  
 });
 
 // Export the generated hook
 export const { 
-  useGetPostsQuery ,
-  useLazyGetPostsByUserIdQuery
+  useLazyGetPostsQuery ,
+  useLazyGetPostsByUserIdQuery,
+  useAddNewPostMutation,
+  useUpdatePostMutation,
+  useDeletePostMutation
 } = extendedApiSlice;
 
 export const selectPostsResult = extendedApiSlice.endpoints.getPosts.select(undefined);
